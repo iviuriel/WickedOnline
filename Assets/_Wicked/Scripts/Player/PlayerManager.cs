@@ -10,24 +10,29 @@ namespace Wicked
     {
         public int id;
         public Character character;
-        public int power;
+        [ReadOnly] public int power;
 
         [HideInInspector]
         public Deck muckDeck;
 
         [ReadOnly]
         public List<Card> handCards = new List<Card>();
+        private int MAX_HAND_CARDS = 4;
 
         private Location curLocation = null;
         private Location lastLocation = null;
+
+        private Action lastAction = null;
 
 
         public void Init(int _id)
         {
             id = _id;
-            power = 0;
+            power = 0;           
+
             if (character == null) character = GetComponent<Character>();
             character.Init(this);
+            character.UpdatePowerUI(power);
         }
 
         #region Turn Cycle
@@ -44,7 +49,6 @@ namespace Wicked
                     ObjectiveCompleted();
                 }
             }*/
-            Debug.Log("Start turn");
             character.domain.ActivateLocations();
 
         }
@@ -54,7 +58,8 @@ namespace Wicked
         /// </summary>
         public void EndTurn()
         {
-            return;
+            curLocation.DeactivateActions();
+            character.domain.DeactivateLocations();
         }
 
         /// <summary>
@@ -66,7 +71,10 @@ namespace Wicked
             return;
         }
 
-
+        public void SetLastAction(Action action)
+        {
+            lastAction = action;
+        }
 
         #endregion
 
@@ -88,22 +96,33 @@ namespace Wicked
 
         #endregion
 
-        #region Actions
+        #region Action - Gain Power
 
         /// <summary>
-        /// Gain power to play cards
+        /// Check amount in bank to gain the amount given
         /// </summary>
         /// <param name="amount"></param>
         public void GainPower(int amount)
         {
-            power += amount;
+            GameManager.Instance.GainPower(this, amount);
+            Debug.Log("Player with ID ["+id+"] has this amount of power: "+power);
+
+            lastAction.SetToUsed();
+            lastAction.Deactivate();
+
+            character.UpdatePowerUI(power);
+
         }
+
+        #endregion
+
+        #region Action - Discard Cards
 
         /// <summary>
         /// Discard a selection of cards and send them to muck deck
         /// </summary>
         /// <param name="cardsToMuck"></param>
-        public void DiscardCards(List<Card> cardsToMuck)
+        private void DiscardCards(List<Card> cardsToMuck)
         {
             foreach (Card c in handCards)
             {
@@ -114,6 +133,93 @@ namespace Wicked
             }
 
             //muckDeck.AddCards(cardsToMuck);
+        }
+
+        /// <summary>
+        /// Select the cards to muck from your hand and muck them
+        /// </summary>
+        /// <param name="cardsToMuck"></param>
+        public void SelectCardsToDiscard()
+        {
+            /// 1. Deactivate Actions
+            /// 2. Activate Cards and UI buttons for discard           
+            return;
+        }
+
+        public void EndSelectCardsToDiscard()
+        {
+            /// 1. Find all cards "selected"
+            /// 2. Discard them
+            /// 3. Activate actions
+            return;
+        }        
+
+        #endregion
+
+        #region Action - Play Card
+
+        public void SelectCardToPlay()
+        {
+            /// 1. Deactivate actions
+            /// 2. Activate selection for 1 card
+            return;
+        }
+
+        public void PlayCard(Card card, Location location)
+        {
+            /// 1. Place the card into that location
+            return;
+        }
+
+        #endregion
+
+        #region Action - Vanquish
+
+        public void StartVanquish()
+        {
+            /// 1. Deactivate actions
+            /// 2. Activate selection for cards
+            return;
+        }
+
+        public void TryVanquish(Card defender, List<Card> attackers)
+        {
+            /// 1. Check if combined attackers power is greater or equal to defender
+            return;
+        }
+
+        public void Vanquish(Card defender, List<Card> attackers)
+        {
+            /// 1. Execute vanquish
+            return;
+        }
+
+        #endregion
+
+        #region Action - Move Card
+
+        public void SelectCardToMove(CardType cardType)
+        {
+            /// 1. Deactivate actions
+            /// 2. activate cards to select
+            /// 3. activate locations to select
+            return;
+        }
+
+        public void PerformFate()
+        {
+            /// 1. Deactivate actions
+            /// 2. choose player
+        }
+        #endregion
+
+        #region UI Buttons
+        
+
+        public void CancelSelectCards()
+        {
+            /// 1. Deactivate selection cards and get back to actions
+            return;
         }
         #endregion
 

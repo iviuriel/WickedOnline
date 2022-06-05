@@ -16,14 +16,14 @@ namespace Wicked
         Ally, 
         Item, 
         Effect,
-        Condition
+        Condition,
+        Curse
     }
 
     public enum FateCardType
     {
         Hero,
         Item,
-        Event,
         Effect,
     }
 

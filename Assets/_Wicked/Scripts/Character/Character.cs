@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using TMPro;
 
 namespace Wicked
 {
@@ -34,6 +35,9 @@ namespace Wicked
         [PreviewField] public Sprite cardBack;
         [PreviewField] public Sprite fateCardBack;
 
+        [Title("UI")]
+        public TextMeshProUGUI powerText;
+
         ///Private variables
         private Location curLocation;
 
@@ -54,5 +58,14 @@ namespace Wicked
             Vector3 locPos = location.transform.position;
             mover.transform.position = new Vector3(locPos.x, locPos.y, mover.transform.position.z);
         }
+
+
+        #region UI
+
+        public void UpdatePowerUI(int power)
+        {
+            powerText.text = power.ToString();
+        }
+        #endregion
     }
 }

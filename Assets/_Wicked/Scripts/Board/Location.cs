@@ -25,6 +25,10 @@ namespace Wicked
         public List<Action> topActions = new List<Action>();
         public List<Action> bottomActions = new List<Action>();
 
+        [Title("Containers")]
+        public Transform normalCardTransform;
+        public Transform fateCardTransform;
+
         [Space(10)]
         [HideInInspector]
         public List<Card> normalCardsPlayed = new List<Card>();
@@ -34,7 +38,8 @@ namespace Wicked
         [BoxGroup("Colors")] public Color ableToSelectColor;
         [BoxGroup("Colors")] public Color unlockedColor;
 
-        private BoxCollider2D collider;
+        private BoxCollider2D boxCollider;
+        private GameObject frameSelector;
 
         #region Inspector Buttons
         [Button(ButtonSizes.Medium)]
@@ -59,7 +64,9 @@ namespace Wicked
                 bottom.Init(this);
             }
 
-            collider = GetComponent<BoxCollider2D>();
+            boxCollider = GetComponent<BoxCollider2D>();
+            frameSelector = transform.GetChild(0).gameObject;
+
             Deactivate();
         }
 
@@ -70,18 +77,17 @@ namespace Wicked
             if (state == LocationState.Unlocked)
             {
                 Activate();
-                Debug.Log("Activated");
             }
         }
 
         private void Activate()
         {
-            collider.enabled = true;
+            boxCollider.enabled = true;
         }
 
         public void Deactivate()
         {
-            collider.enabled = false;
+            boxCollider.enabled = false;
         }
 
         public void SelectLocation()
@@ -90,9 +96,32 @@ namespace Wicked
             domain.character.player.SelectLocation(this);
         }
 
-        public void ActivateActions()
+        public void ActivateActions(bool resetActions = true)
         {
-            return;
+            foreach(Action top in topActions)
+            {
+                if(resetActions) top.ResetAction();
+                top.TryActivate();
+            }
+
+            foreach (Action bottom in bottomActions)
+            {
+                if(resetActions) bottom.ResetAction();
+                bottom.TryActivate();
+            }
+        }
+
+        public void DeactivateActions()
+        {
+            foreach(Action top in topActions)
+            {
+                top.Deactivate();
+            }
+
+            foreach (Action bottom in bottomActions)
+            {
+                bottom.Deactivate();
+            }
         }
 
         #endregion
@@ -101,6 +130,16 @@ namespace Wicked
         private void OnMouseUpAsButton()
         {
             SelectLocation();
+        }
+
+        private void OnMouseEnter()
+        {
+            frameSelector.SetActive(true);
+        }
+
+        private void OnMouseExit()
+        {
+            frameSelector.SetActive(false);
         }
         #endregion
 

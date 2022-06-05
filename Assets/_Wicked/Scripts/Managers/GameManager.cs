@@ -19,8 +19,9 @@ namespace Wicked {
         }
 
         public PlayerManager playerManager;
-
         public List<PlayerManager> players = new List<PlayerManager>();
+
+        public int powerBank = 80;
 
         private PlayerManager curPlayerTurn;
 
@@ -66,6 +67,22 @@ namespace Wicked {
         public bool IsPlayerTurn(int id)
         {
             return curPlayerTurn.id == id;
+        }
+        #endregion
+
+        #region Player Actions
+
+        public void GainPower(PlayerManager player, int amount)
+        {
+            if(powerBank >= amount)
+            {
+                player.power += amount;
+                powerBank -= amount;
+            }else
+            {
+                player.power += powerBank;
+                powerBank = 0;
+            }
         }
         #endregion
 
