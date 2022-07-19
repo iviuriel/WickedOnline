@@ -89,7 +89,6 @@ namespace Wicked
         private void Activate()
         {
             circleCollider.enabled = true;
-            Debug.Log("Action activated");
         }
 
         public void Deactivate()

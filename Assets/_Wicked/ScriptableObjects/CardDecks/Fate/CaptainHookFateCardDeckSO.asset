@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41810dc4f49cbba4095d63101937e00a, type: 3}
+  m_Name: CaptainHookFateCardDeckSO
+  m_EditorClassIdentifier: 
+  type: 1
+  cards:
+  - cardPrefab: {fileID: 8677389381615731256, guid: 7c2da0eb94e69d74eb3117f247aeaee1,
+      type: 3}
+    quantity: 1
+  - cardPrefab: {fileID: 8677389381615731256, guid: 070f87ecbfdadd341b94bf9861fec539,
+      type: 3}
+    quantity: 2
+  - cardPrefab: {fileID: 8677389381615731256, guid: 509c0d357d51b864c9910187944fb845,
+      type: 3}
+    quantity: 1
+  - cardPrefab: {fileID: 8677389381615731256, guid: 9efc760c9f0ab0e489eefbb46db50689,
+      type: 3}
+    quantity: 1
+  - cardPrefab: {fileID: 8677389381615731256, guid: 612b6cff2c7b9ec448759b5ea81b770a,
+      type: 3}
+    quantity: 3
+  - cardPrefab: {fileID: 8677389381615731256, guid: 6da6c45cd13d99b468ca3f683fc20a8e,
+      type: 3}
+    quantity: 2
+  - cardPrefab: {fileID: 8677389381615731256, guid: 17fbae6f66ffedf4abcaee4289885a19,
+      type: 3}
+    quantity: 1
+  - cardPrefab: {fileID: 8677389381615731256, guid: 015aa48fe108d32488d807de0b26f170,
+      type: 3}
+    quantity: 1
+  - cardPrefab: {fileID: 8677389381615731256, guid: a3ed0c1cedada80448eef54b7df5e577,
+      type: 3}
+    quantity: 1
+  - cardPrefab: {fileID: 8677389381615731256, guid: 1b72ca36028a7f3409052bbe32e7dafd,
+      type: 3}
+    quantity: 2
+  numberOfCards: 15
+  outOfRange: 0

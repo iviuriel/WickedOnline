@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Wicked
 {
-    public class BoardManager : SingletonScene<GameManager>
+    public class BoardManager : SingletonScene<BoardManager>
     {
         public static BoardManager Instance
         {
@@ -18,24 +18,30 @@ namespace Wicked
             }
         }
 
-        // Start is called before the first frame update
-        void Start()
+        private int cardsRequired;
+        private NormalCardType normalCardTypeRequired;
+        private FateCardType fateCardTypeRequired;
+
+        public void ActivateCardSelectorHandPlayer(PlayerManager player)
         {
+            List<Card> handCards = player.handCards;
 
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
-
-        public void SelectLocationForPlayer(int playerId, Location location)
-        {
-            if (GameManager.Instance.IsPlayerTurn(playerId))
+            foreach(Card c in handCards)
             {
-                return;
+                c.EnableForSelection();
             }
         }
+
+        public void DectivateCardSelectorHandPlayer(PlayerManager player)
+        {
+            List<Card> handCards = player.handCards;
+
+            foreach (Card c in handCards)
+            {
+                c.DisableForSelection();
+            }
+        }
+
+
     }
 }

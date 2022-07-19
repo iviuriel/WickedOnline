@@ -28,6 +28,7 @@ namespace Wicked
         [Title("Containers")]
         public Transform normalCardTransform;
         public Transform fateCardTransform;
+        public SelectionCard invisibleCard;
 
         [Space(10)]
         [HideInInspector]
@@ -38,8 +39,14 @@ namespace Wicked
         [BoxGroup("Colors")] public Color ableToSelectColor;
         [BoxGroup("Colors")] public Color unlockedColor;
 
+        [FoldoutGroup("In-game parameters")] public float yDisplacement;
+        [FoldoutGroup("In-game parameters")] public float zDisplacement;
+
         private BoxCollider2D boxCollider;
+        private BoxCollider fateCollider;
+        private BoxCollider normalCollider;
         private GameObject frameSelector;
+
 
         #region Inspector Buttons
         [Button(ButtonSizes.Medium)]
@@ -65,9 +72,16 @@ namespace Wicked
             }
 
             boxCollider = GetComponent<BoxCollider2D>();
+            fateCollider = fateCardTransform.GetComponent<BoxCollider>();
+            normalCollider = normalCardTransform.GetComponent<BoxCollider>();
+
+            fateCollider.enabled = false;
+            normalCollider.enabled = false;
+
             frameSelector = transform.GetChild(0).gameObject;
 
             Deactivate();
+            invisibleCard.Deselect();
         }
 
         #region Turn Cycle
@@ -122,6 +136,58 @@ namespace Wicked
             {
                 bottom.Deactivate();
             }
+        }
+
+        public void ActivateCardLocation(CardType type)
+        {
+            Vector3 invisiblePos = Vector3.zero;
+            if (type == CardType.Normal)
+            {
+                normalCollider.enabled = true;
+                invisiblePos = normalCardTransform.position;
+            }
+            else if (type == CardType.Fate)
+            {
+                fateCollider.enabled = true;
+                invisiblePos = fateCardTransform.position;
+            }
+
+            invisibleCard.transform.position = invisiblePos + GetCardNextPositionByType(type);
+        }
+
+        public void DeactivateCardLocation()
+        {
+            normalCollider.enabled = false;
+            fateCollider.enabled = false;
+            invisibleCard.Deselect();
+        }
+
+        private Vector3 GetCardNextPositionByType(CardType type)
+        {
+            return type == CardType.Normal ?
+                new Vector3(0f, -yDisplacement * (normalCardsPlayed.Count), zDisplacement * (normalCardsPlayed.Count)) :
+                new Vector3(0f, yDisplacement * (fateCardsPlayed.Count), zDisplacement * (fateCardsPlayed.Count));
+        }
+
+        public void PlayCard(Card card)
+        {
+            if(card.cardType == CardType.Normal)
+            {
+                card.transform.SetParent(normalCardTransform);
+                card.transform.position = normalCardTransform.position + GetCardNextPositionByType(card.cardType);
+                normalCardsPlayed.Add(card);
+            }
+            else if (card.cardType == CardType.Fate)
+            {
+                card.transform.SetParent(fateCardTransform);
+                card.transform.position = fateCardTransform.position + GetCardNextPositionByType(card.cardType);
+                fateCardsPlayed.Add(card);
+            }
+
+            int layer = LayerMask.NameToLayer("Board");
+            WickedUtils.SetLayerToGameObject(card.gameObject, layer);
+
+            /// Message that card was played
         }
 
         #endregion

@@ -42,6 +42,7 @@ namespace Wicked {
             {
                 PlayerManager player = GameObject.Instantiate(playerManager, playerContainer.transform);
                 player.Init(1);
+                GainPower(player, 5);
                 players.Add(player);
                 StartTurn(player.id);
             }
@@ -83,6 +84,11 @@ namespace Wicked {
                 player.power += powerBank;
                 powerBank = 0;
             }
+        }
+
+        public PlayerManager GetPlayerByID(int id)
+        {
+            return playerManager;
         }
         #endregion
 

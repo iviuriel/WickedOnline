@@ -49,6 +49,11 @@ namespace Wicked
                     return "";
             }
         }
+
+        public static void SetLayerToGameObject(GameObject go, int layer)
+        {
+            go.layer = layer;
+        }
     }
 }
 

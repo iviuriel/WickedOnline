@@ -11,9 +11,7 @@ namespace Wicked
         public int id;
         public Character character;
         [ReadOnly] public int power;
-
-        [HideInInspector]
-        public Deck muckDeck;
+        public Transform handTransform;
 
         [ReadOnly]
         public List<Card> handCards = new List<Card>();
@@ -33,7 +31,27 @@ namespace Wicked
             if (character == null) character = GetComponent<Character>();
             character.Init(this);
             character.UpdatePowerUI(power);
+
+            handCards = character.DrawCards(MAX_HAND_CARDS);
+            UpdateHand();
         }
+
+        #region Hand Actions
+        private void UpdateHand()
+        {
+            for(int i = 0; i < handCards.Count; i++)
+            {
+                Card card = handCards[i];
+                card.transform.SetParent(handTransform);
+                card.transform.localPosition = new Vector3(1f * i, 0f, -0.1f * i);
+                card.ShowCard();
+
+                int layer = LayerMask.NameToLayer("Hand");
+                WickedUtils.SetLayerToGameObject(card.gameObject, layer);
+            }
+        }
+
+        #endregion
 
         #region Turn Cycle
 
@@ -76,6 +94,14 @@ namespace Wicked
             lastAction = action;
         }
 
+        public bool CanPlayCard(Card card)
+        {
+            /// Fate cards no need cost
+            if (card.cardType == CardType.Fate) return true;
+
+            return card.powerCost <= power;
+        }
+
         #endregion
 
         #region Locations
@@ -94,6 +120,16 @@ namespace Wicked
             curLocation.ActivateActions();
         }
 
+        public void ActivateCardLocationSelector(CardType type, Location adyacentTo = null)
+        {
+            character.domain.ActivateCardLocations(type, adyacentTo);
+        }
+        public void DectivateCardLocationSelector()
+        {
+            character.domain.DeactivateCardLocations();
+        }
+
+
         #endregion
 
         #region Action - Gain Power
@@ -111,7 +147,6 @@ namespace Wicked
             lastAction.Deactivate();
 
             character.UpdatePowerUI(power);
-
         }
 
         #endregion
@@ -123,7 +158,7 @@ namespace Wicked
         /// </summary>
         /// <param name="cardsToMuck"></param>
         private void DiscardCards(List<Card> cardsToMuck)
-        {
+        {            
             foreach (Card c in handCards)
             {
                 if (handCards.Contains(c))
@@ -160,12 +195,36 @@ namespace Wicked
 
         public void SelectCardToPlay()
         {
-            /// 1. Deactivate actions
-            /// 2. Activate selection for 1 card
-            return;
+            /// Deactivate other actions
+            curLocation.DeactivateActions();
+
+            /// Enable cards for drag and drop
+            BoardManager.Instance.ActivateCardSelectorHandPlayer(this);
         }
 
-        public void PlayCard(Card card, Location location)
+        public void PlayCardAtLocation(Card card, Location location)
+        {
+            /// Retire card selection from Hand
+            BoardManager.Instance.DectivateCardSelectorHandPlayer(this);
+
+            /// Substract power from player
+            if (card.cardType == CardType.Normal) 
+            {
+                power -= card.powerCost;
+                character.UpdatePowerUI(power);
+            }
+
+            /// Add card to location
+            handCards.Remove(card);
+            location.PlayCard(card);
+
+            /// Deactivate action and activate actions left
+            lastAction.SetToUsed();
+            lastAction.Deactivate();
+            curLocation.ActivateActions();
+        }
+        
+        public void PlayCardAtLocation(Card card, Location location, Card attachedCard)
         {
             /// 1. Place the card into that location
             return;

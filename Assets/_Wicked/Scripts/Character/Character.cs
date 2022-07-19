@@ -30,6 +30,8 @@ namespace Wicked
         [Title("Cards")]
         [InlineEditor] public Deck normalDeck;
         [InlineEditor] public Deck fateDeck;
+        [InlineEditor] public Deck normalDiscardDeck;
+        [InlineEditor] public Deck fateDiscardDeck;
 
         [Title("Card Sprites")]
         [PreviewField] public Sprite cardBack;
@@ -51,12 +53,22 @@ namespace Wicked
             objective.Init(this);
             domain.Init(this);
             domainGameObject = domain.gameObject;
+
+            normalDeck.Init(this);
+            fateDeck.Init(this);
+            normalDiscardDeck.Init(this);
+            fateDiscardDeck.Init(this);
         }
 
         public void MoveAvatar(Location location)
         {
             Vector3 locPos = location.transform.position;
             mover.transform.position = new Vector3(locPos.x, locPos.y, mover.transform.position.z);
+        }
+
+        public List<Card> DrawCards(int amount)
+        {
+            return normalDeck.DrawCards(amount);
         }
 
 
@@ -67,5 +79,14 @@ namespace Wicked
             powerText.text = power.ToString();
         }
         #endregion
+
+        #region Overrides
+
+        public override string ToString()
+        {
+            return WickedUtils.GetCharacterString(character);
+        }
+        #endregion
+
     }
 }

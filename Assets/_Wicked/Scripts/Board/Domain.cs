@@ -41,5 +41,22 @@ namespace Wicked
                 location.Deactivate();
             }
         }
+
+        public void ActivateCardLocations(CardType type, Location adyacentTo = null)
+        {
+            /// TO DO adyacent
+            foreach(Location location in locations)
+            {
+                location.ActivateCardLocation(type);
+            }
+        }
+
+        public void DeactivateCardLocations()
+        {
+            foreach (Location location in locations)
+            {
+                location.DeactivateCardLocation();
+            }
+        }
     }
 }
