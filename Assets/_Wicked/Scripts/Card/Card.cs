@@ -82,6 +82,8 @@ namespace Wicked
         [ReadOnly] public Vector3 lastPosition;
         [ReadOnly] public BoxCollider2D boxCollider;
         [ReadOnly] public Location location;
+        [ReadOnly] public bool canBeSelected;
+        [ReadOnly] public bool canBeDragged;
 
         private PlayerManager player;
         private Location tempLocation;
@@ -122,9 +124,14 @@ namespace Wicked
 
             selected = false;
             dragged = false;
+            canBeSelected = false;
+            canBeDragged = false;
+
             boxCollider = GetComponent<BoxCollider2D>();
             DisableForSelection();
         }
+
+        #region UI & Colliders
 
         public void ShowCard()
         {
@@ -136,23 +143,35 @@ namespace Wicked
             this.transform.localEulerAngles = new Vector3 (0f, 180f, 0f);
         }
 
-        public void DisableForSelection()
+        public void DisableForDrag()
         {
-            boxCollider.enabled = false;
-            hoverSprite.SetActive(false);
-            selectedSprite.SetActive(false);
+            canBeDragged = false;
+            HideUISprites();
         }
 
-        public void EnableForSelection()
+        public void EnableForDrag() { canBeDragged = true; }
+
+        public void DisableForSelection()
         {
-            boxCollider.enabled = true;
+            canBeSelected = false;
+            HideUISprites();
         }
+
+        public void EnableForSelection() { canBeSelected = true; }
 
         public void ToggleSelected()
         {
             selected = !selected;
             selectedSprite.SetActive(selected);
         }
+
+        private void HideUISprites()
+        {
+            hoverSprite.SetActive(false);
+            selectedSprite.SetActive(false);
+        }
+
+        #endregion
 
         #region Unity 
 
@@ -192,35 +211,42 @@ namespace Wicked
             }
         }
 
-        private void OnMouseEnter() { hoverSprite.SetActive(true); }
-        private void OnMouseExit() { hoverSprite.SetActive(false); }
+        private void OnMouseEnter() { if(canBeSelected || canBeDragged) hoverSprite.SetActive(true); }
+        private void OnMouseExit() { if (canBeSelected || canBeDragged) hoverSprite.SetActive(false); }
         private void OnMouseDown() {
-            ToggleSelected();
-            lastPosition = transform.position;
-
-            player.ActivateCardLocationSelector(cardType);
-            
+            if (canBeSelected)
+            {
+                ToggleSelected();
+            }
+            if (canBeDragged)
+            {
+                lastPosition = transform.position;
+                player.ActivateCardLocationSelector(cardType);
+            }           
         }
 
         private void OnMouseUp()
         {
-            player.DectivateCardLocationSelector();
-            if (dragged)
+            if (canBeDragged)
             {
-                dragged = false;
-                ToggleSelected();
-                if(tempLocation != null && player.CanPlayCard(this))
+                player.DectivateCardLocationSelector();
+                if (dragged)
                 {
-                    player.PlayCardAtLocation(this, tempLocation);
-                }
-                else
-                {
-                    transform.position = lastPosition;
+                    dragged = false;
+                    ToggleSelected();
+                    if (tempLocation != null && player.CanPlayCard(this))
+                    {
+                        player.PlayCardAtLocation(this, tempLocation);
+                    }
+                    else
+                    {
+                        transform.position = lastPosition;
+                    }
                 }
             }
         }
 
-        private void OnMouseDrag() { dragged = true; }
+        private void OnMouseDrag() { if(canBeDragged) dragged = true; }
 
         #endregion
     }

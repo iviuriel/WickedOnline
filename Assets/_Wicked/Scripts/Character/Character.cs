@@ -39,6 +39,7 @@ namespace Wicked
 
         [Title("UI")]
         public TextMeshProUGUI powerText;
+        public GameObject discardUI;
 
         ///Private variables
         private Location curLocation;
@@ -58,6 +59,8 @@ namespace Wicked
             fateDeck.Init(this);
             normalDiscardDeck.Init(this);
             fateDiscardDeck.Init(this);
+
+            HideDiscardUI();
         }
 
         public void MoveAvatar(Location location)
@@ -78,6 +81,9 @@ namespace Wicked
         {
             powerText.text = power.ToString();
         }
+
+        public void ShowDiscardUI() { discardUI.SetActive(true); }
+        public void HideDiscardUI() { discardUI.SetActive(false); }
         #endregion
 
         #region Overrides

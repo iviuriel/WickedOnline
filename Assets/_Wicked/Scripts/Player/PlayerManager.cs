@@ -2,6 +2,7 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Wicked
@@ -76,6 +77,11 @@ namespace Wicked
         /// </summary>
         public void EndTurn()
         {
+            /// Draw cards left
+            int cardsLeft = MAX_HAND_CARDS - handCards.Count;
+            handCards.AddRange(character.DrawCards(cardsLeft));
+            UpdateHand();
+
             curLocation.DeactivateActions();
             character.domain.DeactivateLocations();
         }
@@ -158,8 +164,8 @@ namespace Wicked
         /// </summary>
         /// <param name="cardsToMuck"></param>
         private void DiscardCards(List<Card> cardsToMuck)
-        {            
-            foreach (Card c in handCards)
+        {   
+            foreach (Card c in cardsToMuck)
             {
                 if (handCards.Contains(c))
                 {
@@ -167,7 +173,7 @@ namespace Wicked
                 }
             }
 
-            //muckDeck.AddCards(cardsToMuck);
+            character.normalDiscardDeck.AddCards(cardsToMuck);
         }
 
         /// <summary>
@@ -176,17 +182,34 @@ namespace Wicked
         /// <param name="cardsToMuck"></param>
         public void SelectCardsToDiscard()
         {
-            /// 1. Deactivate Actions
-            /// 2. Activate Cards and UI buttons for discard           
-            return;
+            /// Deactivate other actions
+            curLocation.DeactivateActions();
+            /// Enable cards for select
+            BoardManager.Instance.EnableCardsForSelectionInPlayerHand(this);
+            /// Enable UI buttons
+            character.ShowDiscardUI();         
         }
 
-        public void EndSelectCardsToDiscard()
+        public void EndSelectCardsToDiscard(bool completed = true)
         {
-            /// 1. Find all cards "selected"
-            /// 2. Discard them
-            /// 3. Activate actions
-            return;
+            /// Deactivate other actions
+            curLocation.ActivateActions();
+            /// Enable cards for select
+            BoardManager.Instance.DisableCardsForSelectionInPlayerHand(this);
+            /// Enable UI buttons
+            character.HideDiscardUI();
+
+            if (completed)
+            {
+                List<Card> cardsToMuck = handCards.FindAll(x => x.selected);
+                if (cardsToMuck.Count == 0) return;
+                DiscardCards(cardsToMuck);
+                UpdateHand();
+            }
+            else
+            {
+                handCards.ForEach(x => x.selected = false);
+            }            
         }        
 
         #endregion
@@ -199,13 +222,13 @@ namespace Wicked
             curLocation.DeactivateActions();
 
             /// Enable cards for drag and drop
-            BoardManager.Instance.ActivateCardSelectorHandPlayer(this);
+            BoardManager.Instance.EnableCardsForDragInPlayerHand(this);
         }
 
         public void PlayCardAtLocation(Card card, Location location)
         {
             /// Retire card selection from Hand
-            BoardManager.Instance.DectivateCardSelectorHandPlayer(this);
+            BoardManager.Instance.DisableCardsForDragInPlayerHand(this);
 
             /// Substract power from player
             if (card.cardType == CardType.Normal) 

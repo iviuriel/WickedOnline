@@ -58,7 +58,9 @@ namespace Wicked {
 
         public void EndTurn(int id)
         {
-            return;
+            PlayerManager player = players.Find(x => x.id == id);
+            player.EndTurn();
+            player.StartTurn();
         }
 
         #endregion

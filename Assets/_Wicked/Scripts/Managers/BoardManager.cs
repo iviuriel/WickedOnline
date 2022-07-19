@@ -22,17 +22,37 @@ namespace Wicked
         private NormalCardType normalCardTypeRequired;
         private FateCardType fateCardTypeRequired;
 
-        public void ActivateCardSelectorHandPlayer(PlayerManager player)
+        public void EnableCardsForDragInPlayerHand(PlayerManager player)
         {
             List<Card> handCards = player.handCards;
 
             foreach(Card c in handCards)
             {
+                c.EnableForDrag();
+            }
+        }
+
+        public void DisableCardsForDragInPlayerHand(PlayerManager player)
+        {
+            List<Card> handCards = player.handCards;
+
+            foreach (Card c in handCards)
+            {
+                c.DisableForDrag();
+            }
+        }
+
+        public void EnableCardsForSelectionInPlayerHand(PlayerManager player)
+        {
+            List<Card> handCards = player.handCards;
+
+            foreach (Card c in handCards)
+            {
                 c.EnableForSelection();
             }
         }
 
-        public void DectivateCardSelectorHandPlayer(PlayerManager player)
+        public void DisableCardsForSelectionInPlayerHand(PlayerManager player)
         {
             List<Card> handCards = player.handCards;
 

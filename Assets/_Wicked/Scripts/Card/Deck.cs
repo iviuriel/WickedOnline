@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Sirenix.OdinInspector;
 
@@ -49,10 +50,9 @@ namespace Wicked
                     GameObject go = Instantiate(cardOption.cardPrefab, cardParent, false);
                     Card card = go.GetComponent<Card>();
 
-                    card.transform.localPosition = new Vector3(0f, 0.0f, 0.01f * cardPile.Count);
-                    card.HideCard();
+                    AddCard(card);
 
-                    cardPile.Add(card);
+                    
                 }
             }
         }
@@ -101,6 +101,30 @@ namespace Wicked
                 c.Add(DrawCard());
             }
             return c;
+        }
+
+        public void AddCards (List<Card> cardsToAdd)
+        {
+            foreach(Card c in cardsToAdd)
+            {
+                c.transform.SetParent(cardParent);
+                AddCard(c);
+            }
+        }
+
+        public void AddCard(Card card)
+        {
+            card.transform.localPosition = new Vector3(0f, 0.0f, 0.01f * cardPile.Count);
+            if (isDiscardDeck)
+            {
+                card.ShowCard();
+            }
+            else
+            {
+                card.HideCard();
+            }
+
+            cardPile.Add(card);
         }
 
     }
