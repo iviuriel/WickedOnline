@@ -171,6 +171,8 @@ namespace Wicked
 
         public void PlayCard(Card card)
         {
+            card.location = this;
+
             if(card.cardType == CardType.Normal)
             {
                 card.transform.SetParent(normalCardTransform);
@@ -188,6 +190,65 @@ namespace Wicked
             WickedUtils.SetLayerToGameObject(card.gameObject, layer);
 
             /// Message that card was played
+        }
+
+        public void ActivateCardsByGroupType(List<CardGroup> cardGroup)
+        {
+            foreach(Card card in normalCardsPlayed)
+            {
+                foreach(CardGroup group in cardGroup)
+                {
+                    if(group.CheckCard(card))
+                    {
+                        card.EnableForSelection();
+                    }
+                }
+            }
+
+            foreach(Card card in fateCardsPlayed)
+            {
+                foreach(CardGroup group in cardGroup)
+                {
+                    if(group.CheckCard(card))
+                    {
+                        card.EnableForSelection();
+                    }
+                }
+            }
+        }
+
+        public void DeactivateAllCards()
+        {
+            foreach(Card card in normalCardsPlayed)
+            {
+                card.DisableForSelection();
+                card.DisableForDrag();
+            }
+
+            foreach(Card card in fateCardsPlayed)
+            {
+                card.DisableForSelection();
+                card.DisableForDrag();
+            }
+        }
+
+        public List<Location> GetAdyacents()
+        {            
+            List<Location> adyacents = new List<Location>();
+            List<Location> allLocations = domain.locations;
+            int index = allLocations.IndexOf(this);
+
+            if(index > 0)
+            {
+                adyacents.Add(allLocations[index-1]);
+            }
+
+            if(index < allLocations.Count-1)
+            {
+                adyacents.Add(allLocations[index+1]);
+            }
+
+            return adyacents;            
         }
 
         #endregion

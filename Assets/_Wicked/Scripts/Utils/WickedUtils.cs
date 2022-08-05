@@ -6,6 +6,16 @@ namespace Wicked
 {
     public static class WickedUtils
     {
+        public static class AlertStrings
+        {
+            public static string CannotAddAnotherHero = "Some hero was already selected to be confronted";
+            public static string HeroMissing = "No HERO was selected to vanquish";
+            public static string AttackersMissing = "You need to select at least one ALLY to vanquish";
+            public static string NotEnoughStrength = "Your allies have not enough strength to defeat that hero";
+            public static string WrongLocationVanquish = "One or more of the attackers can vanquish because they are "+
+                "at the same location than the defender";
+        }
+
         public static string GetCharacterString(CharacterName name)
         {
             switch(name)

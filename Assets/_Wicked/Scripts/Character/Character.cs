@@ -40,6 +40,7 @@ namespace Wicked
         [Title("UI")]
         public TextMeshProUGUI powerText;
         public GameObject discardUI;
+        public GameObject vanquishUI;
 
         ///Private variables
         private Location curLocation;
@@ -84,6 +85,19 @@ namespace Wicked
 
         public void ShowDiscardUI() { discardUI.SetActive(true); }
         public void HideDiscardUI() { discardUI.SetActive(false); }
+
+        public void ShowVanquishUI() { vanquishUI.SetActive(true); }
+        public void HideVanquishUI() { vanquishUI.SetActive(false); }
+
+        public void UpdateVanquishUI(int powerDefender, int powerAttacker)
+        {
+            return;
+        }
+
+        public void AlertUI(string text)
+        {
+            return;
+        }
         #endregion
 
         #region Overrides

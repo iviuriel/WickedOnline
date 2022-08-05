@@ -24,6 +24,13 @@ namespace Wicked
         private Action lastAction = null;
 
 
+        ///Vanquish
+        [HideInInspector] public List<Card> vanquishAttackers = new();
+        [HideInInspector] public Card vanquishDefender;
+        [HideInInspector] public int strengthAttackers = 0;
+        [HideInInspector] public int strengthDefender = 0;
+
+
         public void Init(int _id)
         {
             id = _id;
@@ -98,6 +105,11 @@ namespace Wicked
         public void SetLastAction(Action action)
         {
             lastAction = action;
+        }
+
+        public Action GetLastAction()
+        {
+            return lastAction;
         }
 
         public bool CanPlayCard(Card card)
@@ -259,21 +271,116 @@ namespace Wicked
 
         public void StartVanquish()
         {
-            /// 1. Deactivate actions
-            /// 2. Activate selection for cards
-            return;
+            /// Deactivate other actions
+            curLocation.DeactivateActions();
+            /// Enable cards for select
+            BoardManager.Instance.EnableCardOfTypesAllLocations(this, BoardManager.Instance.vanquishGroupType);
+            /// Enable UI buttons
+            character.ShowVanquishUI();  
+            /// Reset cards
+            vanquishDefender = null;
+            vanquishAttackers.Clear();
+            strengthAttackers = 0;
+            strengthDefender = 0;
         }
 
-        public void TryVanquish(Card defender, List<Card> attackers)
+        public void TryVanquish()
         {
-            /// 1. Check if combined attackers power is greater or equal to defender
-            return;
+            if(vanquishDefender == null) character.AlertUI(WickedUtils.AlertStrings.HeroMissing);
+            if(vanquishAttackers.Count == 0) character.AlertUI(WickedUtils.AlertStrings.AttackersMissing);
+
+            Location vanquishLocation = vanquishDefender.location;
+            
+            foreach(Card card in vanquishAttackers)
+            {
+                if(!card.CanVanquishAtLocation(vanquishLocation))
+                {
+                    character.AlertUI(WickedUtils.AlertStrings.WrongLocationVanquish);
+                    return;
+                }
+            }
+
+            if(strengthAttackers < strengthDefender) 
+            {
+                character.AlertUI(WickedUtils.AlertStrings.NotEnoughStrength);
+            }
+            else
+            {
+                Vanquish();
+            }
         }
 
-        public void Vanquish(Card defender, List<Card> attackers)
+        public void Vanquish()
         {
-            /// 1. Execute vanquish
-            return;
+            if(vanquishDefender.strength != 0)
+            {
+                /// We have to discard also all items associated to cards
+                List<Card> additionalCards = new List<Card>();
+                foreach(Card card in vanquishAttackers)
+                {
+                    additionalCards.AddRange(card.itemsAttached);
+                }
+
+                vanquishAttackers.AddRange(additionalCards);
+                character.normalDiscardDeck.AddCards(vanquishAttackers);
+            }
+
+            character.fateDiscardDeck.AddCards(vanquishDefender.itemsAttached);
+            character.fateDiscardDeck.AddCard(vanquishDefender);
+
+            /// Activate other actions
+            lastAction.SetToUsed();
+            lastAction.Deactivate();
+            curLocation.ActivateActions();
+            /// Disable cards for select
+            BoardManager.Instance.DisableAllCardAllLocations(this);
+            /// Enable UI buttons
+            character.HideVanquishUI();  
+            /// Reset cards
+            vanquishDefender = null;
+            vanquishAttackers.Clear();
+        }
+
+        public void AddCardToVanquish(Card card)
+        {
+            if(card.cardType == CardType.Normal)
+            {
+                vanquishAttackers.Add(card);
+                strengthAttackers += card.strength;
+            }
+            else if(card.cardType == CardType.Fate)
+            {
+                if(vanquishDefender != null)
+                {
+                    character.AlertUI(WickedUtils.AlertStrings.CannotAddAnotherHero);
+                }
+                else
+                {
+                    vanquishDefender = card;
+                    strengthDefender = vanquishDefender.strength;
+                }
+            }
+
+            character.UpdateVanquishUI(strengthDefender, strengthAttackers);
+        }
+
+        public void RemoveCardToVanquish(Card card)
+        {
+            if(card.cardType == CardType.Normal)
+            {
+                vanquishAttackers.Remove(card);
+                strengthAttackers -= card.strength;
+            }
+            else if(card.cardType == CardType.Fate)
+            {
+                if(vanquishDefender != null && vanquishDefender == card)
+                {
+                    vanquishDefender = null;
+                    strengthDefender = 0;
+                }
+            }
+
+            character.UpdateVanquishUI(strengthDefender, strengthAttackers);
         }
 
         #endregion

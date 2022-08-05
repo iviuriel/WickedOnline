@@ -54,10 +54,18 @@ namespace Wicked
         
         [ShowIfGroup("CheckAllyOrHero")]
         [TitleGroup("CheckAllyOrHero/Ally Card")]        
+        public int baseStrength;
+        [TitleGroup("CheckAllyOrHero/Ally Card"), ReadOnly]        
         public int strength;
 
         [TitleGroup("CheckAllyOrHero/Ally Card"), ReadOnly]
         public List<Card> itemsAttached;
+
+        [TitleGroup("CheckAlly/Ally Card")]
+        public bool canVanquishOtherLocations = false;
+        [TitleGroup("CheckAlly/Ally Card")]
+        public bool canVanquishAdyacents = false;
+        
 
         [ShowIfGroup("CheckItemType")]
         [TitleGroup("CheckItemType/Item Card")]        
@@ -109,6 +117,8 @@ namespace Wicked
                 || (cardType == CardType.Fate && fateCardType == FateCardType.Hero);
         }
 
+        private bool CheckAlly() {return cardType == CardType.Normal && normalCardType == NormalCardType.Ally; }
+
         private bool CheckItemType()
         {
             return (cardType == CardType.Normal && normalCardType == NormalCardType.Item)
@@ -121,6 +131,7 @@ namespace Wicked
         {
             character = _character;
             player = character.player;
+            strength = baseStrength;
 
             selected = false;
             dragged = false;
@@ -129,6 +140,24 @@ namespace Wicked
 
             boxCollider = GetComponent<BoxCollider2D>();
             DisableForSelection();
+        }
+
+        public bool CanVanquishAtLocation(Location loc)
+        {
+            if(canVanquishOtherLocations)
+            {
+                if(canVanquishAdyacents)
+                {
+                    List<Location> adyacents = location.GetAdyacents();
+                    return adyacents.Contains(loc);
+                }
+
+                return true;
+            }
+            else
+            {
+                return loc == location;
+            }
         }
 
         #region UI & Colliders
@@ -163,6 +192,19 @@ namespace Wicked
         {
             selected = !selected;
             selectedSprite.SetActive(selected);
+
+            if(player.GetLastAction().actionType == ActionType.Vanquish)
+            {
+                if(selected)
+                {
+                    player.AddCardToVanquish(this);
+                }
+                else
+                {
+                    player.RemoveCardToVanquish(this);
+                }
+                
+            }
         }
 
         private void HideUISprites()
@@ -233,7 +275,7 @@ namespace Wicked
                 if (dragged)
                 {
                     dragged = false;
-                    ToggleSelected();
+                    //ToggleSelected();
                     if (tempLocation != null && player.CanPlayCard(this))
                     {
                         player.PlayCardAtLocation(this, tempLocation);

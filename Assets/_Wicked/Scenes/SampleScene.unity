@@ -333,6 +333,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4b7388a89b929945ace9287ff7b0c47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  vanquishGroupType:
+  - cardType: 0
+    normalCardType: 0
+    fateCardType: 0
+  - cardType: 1
+    normalCardType: 0
+    fateCardType: 0
 --- !u!1 &436724181
 GameObject:
   m_ObjectHideFlags: 0
